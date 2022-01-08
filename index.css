@@ -1,0 +1,68 @@
+:root{
+    --gray:rgb(107, 105, 105);
+    --lighttile:rgb(0, 144, 84);
+    --darktile:rgb(0, 104, 60);
+    --gbborder: rgb(7, 82, 51);
+    --snake: rgb(18, 131, 175);
+    --head: rgb(125, 9, 219);
+    --food: rgb(219, 9, 44);
+}
+html, body{
+    margin:0;
+    padding:0;
+    position:relative; 
+    box-sizing: border-box;
+}
+
+#main{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--gray);
+}
+
+#gameboardwrap{
+    width:820px;
+    height:820px;
+    padding:20px;
+    max-width: 85vmin;
+    max-height:85vmin;
+    border:2px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--gbborder);
+}
+
+#gameboard{
+    display:grid;
+    width: 100%;
+    height: 100%;
+}
+
+#gameboard>div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.snake{
+    width:100%;
+    height: 100%;
+    background:var(--snake);
+}
+
+#snakehead{
+    width:100%;
+    height: 100%;
+    background:var(--head);
+}
+
+.food{
+    width:80%;
+    height:80%;
+    background:var(--food);
+    border-radius: 100%;
+}
