@@ -3,8 +3,7 @@
     --lighttile:rgb(0, 144, 84);
     --darktile:rgb(0, 104, 60);
     --gbborder: rgb(7, 82, 51);
-    --snake: rgb(18, 131, 175);
-    --head: rgb(125, 9, 219);
+    --snake: rgb(115, 1, 119);
     --food: rgb(219, 9, 44);
 }
 html, body{
@@ -55,9 +54,8 @@ html, body{
 }
 
 #snakehead{
-    width:100%;
-    height: 100%;
-    background:var(--head);
+    border-top-left-radius:150000%;
+    border-top-right-radius: 150000%;
 }
 
 .food{

@@ -19,7 +19,7 @@ class gameboard {
 class game {
     dir = 'N'
     lastdir
-    gamespeed = 10
+    gamespeed = 12
     render
     snake = [
         { x: 10, y: 9 },
@@ -121,6 +121,20 @@ class game {
                 el.id = 'snakehead'
             el.classList.add('snake')
             this.getEl(e.x, e.y).appendChild(el)
+        }
+        //rotate head
+        switch (this.lastdir) {
+            case 'N':
+                document.getElementById('snakehead').style.transform = 'rotate(0deg)'
+                break
+            case 'E':
+                document.getElementById('snakehead').style.transform = 'rotate(90deg)'
+                break
+            case 'S':
+                document.getElementById('snakehead').style.transform = 'rotate(180deg)'
+                break
+            case 'W':
+                document.getElementById('snakehead').style.transform = 'rotate(270deg)'
         }
     }
     getEl(x, y) {
