@@ -18,7 +18,8 @@ class gameboard {
 
 class game {
     dir = 'N'
-    gamespeed = 15
+    lastdir
+    gamespeed = 10
     render
     snake = [
         { x: 10, y: 9 },
@@ -27,28 +28,32 @@ class game {
     ]
     gaming = true
     constructor() {
+        this.createFood()
+        this.draw()
         window.addEventListener('keydown', (e) => {
             switch (e.key) {
                 case 'ArrowUp':
-                    if (this.dir != 'S')
+                    if (this.lastdir != 'S')
                         this.dir = 'N'
                     break
                 case 'ArrowRight':
-                    if (this.dir != 'W')
+                    if (this.lastdir != 'W')
                         this.dir = 'E'
                     break
                 case 'ArrowDown':
-                    if (this.dir != 'N')
+                    if (this.lastdir != 'N')
                         this.dir = 'S'
                     break
                 case 'ArrowLeft':
-                    if (this.dir != 'E')
+                    if (this.lastdir != 'E')
                         this.dir = 'W'
+                    break
+                default: return
             }
+            this.render = Date.now()
+            window.requestAnimationFrame(() => this.loop())
         })
-        this.createFood()
-        this.render = Date.now()
-        window.requestAnimationFrame(() => this.loop())
+
     }
     loop() {
         if (!this.gaming)
@@ -58,6 +63,7 @@ class game {
         const interval = (newRender - this.render) / 1000
         if (interval < 1 / this.gamespeed) return
         this.render = newRender
+        this.lastdir = this.dir
         this.update()
         if (!this.gaming)
             return
@@ -80,7 +86,7 @@ class game {
             case 'W':
                 this.snake[0].x--
         }
-        let entrytile = this.getEl(this.snake[0].x, this.snake[0].y)
+        const entrytile = this.getEl(this.snake[0].x, this.snake[0].y)
         //check if hit border
         if (this.snake[0].x < 0 || this.snake[0].y < 0 || this.snake[0].x >= GBSIZE || this.snake[0].y >= GBSIZE)
             this.lose()
@@ -104,7 +110,6 @@ class game {
         //make snake larger if ate
         if (ate)
             this.snake.push({ x: prev.x, y: prev.y })
-
     }
     draw() {
         let els = document.querySelectorAll('.snake')
@@ -125,18 +130,23 @@ class game {
                 return e
     }
     createFood() {
-        let x = Math.floor(Math.random() * GBSIZE)
-        let y = Math.floor(Math.random() * GBSIZE)
+        const x = Math.floor(Math.random() * GBSIZE)
+        const y = Math.floor(Math.random() * GBSIZE)
         let tile = this.getEl(x, y)
         if (tile.children.length == 0) {
             let el = document.createElement('div')
             el.classList.add('food')
             tile.appendChild(el)
         }
+        else
+            this.createFood()
     }
     lose() {
         this.gaming = false
         alert(`Game over!\nSnake length: ${this.snake.length}`)
+        for (const e of document.getElementById('gameboard').children)
+            e.innerHTML = ''
+        new game()
     }
 }
 
