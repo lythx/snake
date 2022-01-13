@@ -3,14 +3,16 @@
     --lighttile:rgb(0, 144, 84);
     --darktile:rgb(0, 104, 60);
     --gbborder: rgb(7, 82, 51);
-    --snake: rgb(115, 1, 119);
+    --snake: rgb(19, 68, 204);
     --food: rgb(219, 9, 44);
+    --confirm: rgb(15, 128, 80);
 }
 html, body{
     margin:0;
     padding:0;
     position:relative; 
     box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
 }
 
 #main{
@@ -22,12 +24,60 @@ html, body{
     background-color: var(--gray);
 }
 
+#top{
+    width:100%;
+    display: flex;
+    flex-flow:  wrap;
+    justify-content: space-between;
+    height:80px;
+}
+
+#count{
+    width: 140px;
+    height: 60px;
+    margin: 10px;
+    background: var(--lighttile);
+    border: 2px solid var(--gbborder);
+    border-radius: 30px;
+    color: white;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#countimg{
+    height: 70%;
+    width:30%;
+    background-image: url("gfx/apple.png");
+    background-size: cover;
+}
+
+#count>span{
+    font-size: 30px;
+}
+
+#settingsbt{
+    width: 60px;
+    height: 60px;
+    margin: 10px;
+    background: var(--lighttile);
+    border: 2px solid var(--gbborder);
+    border-radius: 100px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+}
+
 #gameboardwrap{
     width:820px;
     height:820px;
     padding:20px;
-    max-width: 85vmin;
-    max-height:85vmin;
+    max-width: 70vmin;
+    max-height:70vmin;
+    min-width: 380px;
+    min-height: 380px;
     border:2px solid black;
     display: flex;
     justify-content: center;
@@ -54,13 +104,73 @@ html, body{
 }
 
 #snakehead{
-    border-top-left-radius:150000%;
-    border-top-right-radius: 150000%;
+    background: none;
+    background-image: url('gfx/snake.png');
+    background-size: cover;
+    z-index: 10;
 }
 
 .food{
-    width:80%;
-    height:80%;
-    background:var(--food);
-    border-radius: 100%;
+    width:95%;
+    height:95%;
+    background-image: url("gfx/apple.png");
+    background-size: cover;
+}
+
+#settingsbg{
+    position:absolute;
+    z-index: 10;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    left:0;
+    top:0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#settings{
+    width:250px;
+    height: 200px;
+    background: var(--lighttile);
+    border: 4px solid var(--gbborder);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-flow: wrap;
+}
+
+.settingswrap{
+    width:60%;
+    height:50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-flow:  wrap;
+}
+
+.settingstext{
+    color: white;
+    font-size: 20px;
+}
+
+.settingsinput{
+    width:50px;
+    height: 30px;
+    font-size: 20px;
+}
+
+#confirm{
+    width:100px;
+    height:40px;
+    background: var(--confirm);
+    border: 2px solid var(--gbborder);
+    border-radius: 20px;
+    color:white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 21px;
 }

@@ -1,11 +1,29 @@
-const GBSIZE = 20
+
+let GBSIZE = 20
+let SPEED = 12
+let GAMING = false
 
 class gameboard {
     constructor() {
+        document.getElementById('main').innerHTML = `
+        <div id='content'>
+            <div id='top'>
+                <div id="count">
+                    <div id="countimg"></div>
+                    <span>0</span>
+                </div>
+                <div id="settingsbt">
+                    <img src="https://img.icons8.com/ios/50/ffffff/settings--v1.png" />
+                </div>
+            </div>
+            <div id="gameboardwrap">
+                <div id="gameboard"></div>
+            </div>
+        </div>`
         let gb = document.getElementById('gameboard')
         gb.style.gridTemplateColumns = `repeat(${GBSIZE} , 1fr)`
         gb.style.gridTemplateRows = `repeat(${GBSIZE} , 1fr)`
-        for (let i = 0; i < GBSIZE; i++)
+        for (let i = 0; i < GBSIZE; i++) {
             for (let j = 0; j < GBSIZE; j++) {
                 let el = document.createElement('div')
                 el.style.background = (i + j) % 2 == 0 ? 'var(--lighttile)' : 'var(--darktile)'
@@ -13,24 +31,27 @@ class gameboard {
                 el.classList.add(`col${j}`)
                 gb.appendChild(el)
             }
+        }
+        document.getElementById('settingsbt').addEventListener('click', () => {
+            new settings()
+        })
     }
 }
 
 class game {
     dir = 'N'
     lastdir
-    gamespeed = 12
     render
-    snake = [
-        { x: 10, y: 9 },
-        { x: 10, y: 10 },
-        { x: 10, y: 11 }
-    ]
-    gaming = true
+    snake
     constructor() {
-        this.createFood()
+        this.snake = [
+            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) - 1 },
+            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) },
+            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) + 1 }
+        ]
         this.draw()
-        window.addEventListener('keydown', (e) => {
+        this.createFood()
+        window.onkeydown = (e) => {
             switch (e.key) {
                 case 'ArrowUp':
                     if (this.lastdir != 'S')
@@ -43,29 +64,30 @@ class game {
                 case 'ArrowDown':
                     if (this.lastdir != 'N')
                         this.dir = 'S'
-                    break
+                    return
                 case 'ArrowLeft':
                     if (this.lastdir != 'E')
                         this.dir = 'W'
                     break
                 default: return
             }
+            GAMING = true
             this.render = Date.now()
             window.requestAnimationFrame(() => this.loop())
-        })
+        }
 
     }
     loop() {
-        if (!this.gaming)
+        if (!GAMING)
             return
         window.requestAnimationFrame(() => this.loop())
         let newRender = Date.now()
         const interval = (newRender - this.render) / 1000
-        if (interval < 1 / this.gamespeed) return
+        if (interval < 1 / SPEED) return
         this.render = newRender
         this.lastdir = this.dir
         this.update()
-        if (!this.gaming)
+        if (!GAMING)
             return
         this.draw()
     }
@@ -136,6 +158,8 @@ class game {
             case 'W':
                 document.getElementById('snakehead').style.transform = 'rotate(270deg)'
         }
+        //count
+        document.getElementById('count').children[1].innerHTML = this.snake.length - 3
     }
     getEl(x, y) {
         let els = document.querySelectorAll(`.col${x}`)
@@ -156,7 +180,7 @@ class game {
             this.createFood()
     }
     lose() {
-        this.gaming = false
+        GAMING = false
         alert(`Game over!\nSnake length: ${this.snake.length}`)
         for (const e of document.getElementById('gameboard').children)
             e.innerHTML = ''
@@ -168,3 +192,82 @@ window.addEventListener('DOMContentLoaded', () => {
     new gameboard()
     new game()
 })
+
+class settings {
+    active
+    waiting = false
+    inputs = [
+        { id: 'speed', name: 'Speed', value: SPEED.toString(), max: 60, min: 1 },
+        { id: 'size', name: 'Size', value: GBSIZE.toString(), max: 100, min: 10 }
+    ]
+    constructor() {
+        this.active = true
+        GAMING = false
+        let bg = document.createElement('div')
+        bg.id = 'settingsbg'
+        document.body.appendChild(bg)
+        let settings = document.createElement('div')
+        settings.id = 'settings'
+        document.getElementById('settingsbg').appendChild(settings)
+        for (let i = 0; i < this.inputs.length; i++) {
+            let wrap = document.createElement('div')
+            wrap.classList.add('settingswrap')
+            settings.appendChild(wrap)
+            let txt = document.createElement('div')
+            txt.classList.add('settingstext')
+            txt.innerHTML = this.inputs[i].name
+            wrap.appendChild(txt)
+            let inp = document.createElement('input')
+            inp.type = 'number'
+            inp.id = this.inputs[i].id
+            inp.max = this.inputs[i].max
+            inp.min = this.inputs[i].min
+            inp.value = this.inputs[i].value
+            inp.classList.add('settingsinput')
+            wrap.appendChild(inp)
+        }
+        let confirm = document.createElement('div')
+        confirm.id = 'confirm'
+        confirm.innerHTML = 'Confirm'
+        settings.appendChild(confirm)
+        confirm.addEventListener('click', () => {
+            this.handleConfirm()
+        })
+        window.addEventListener('keydown', (e) => {
+            if (!this.active) return
+            console.log(e.key)
+            if (e.key == 'Enter') {
+                this.handleConfirm()
+            }
+        })
+        window.addEventListener('keyup', async (e) => {
+            if (!this.active) return
+            this.waiting = true
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            this.waiting = false
+            for (const e of this.inputs) {
+                if (!document.getElementById(e.id)) return
+                let val = document.getElementById(e.id).value
+                if (val > e.max)
+                    document.getElementById(e.id).value = e.max
+                else if (val < e.min)
+                    document.getElementById(e.id).value = e.min
+            }
+        })
+    }
+    handleConfirm() {
+        this.active = false
+        SPEED = document.getElementById('speed').value
+        GBSIZE = document.getElementById('size').value
+        // console.log(Number(GBSIZE))
+        // if (Number(SPEED) < this.inputs[0].min) SPEED = this.inputs.min
+        // else if (Number(SPEED) > this.inputs[0].max) SPEED = this.inputs.max
+        // if (Number(GBSIZE) < this.inputs[1].min) GBSIZE = this.inputs.min
+        // else if (Number(GBSIZE) > this.inputs[1].max) GBSIZE = this.inputs.max
+        document.getElementById('settings').remove()
+        document.getElementById('settingsbg').remove()
+        document.getElementById('main').innerHTML = ''
+        new gameboard()
+        new game()
+    }
+}
