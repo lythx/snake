@@ -1,6 +1,6 @@
 
-let GBSIZE = 20
-let SPEED = 12
+let GBSIZE = 17
+let SPEED = 10
 let GAMING = false
 
 class gameboard {
@@ -45,12 +45,11 @@ class game {
     snake
     constructor() {
         this.snake = [
-            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) - 1 },
-            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) },
-            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) + 1 }
+            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) - 1, dir: 'N' },
+            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2), dir: 'N' },
+            { x: Math.floor(GBSIZE / 2), y: Math.floor(GBSIZE / 2) + 1, dir: 'N' }
         ]
         this.draw()
-        this.createFood()
         window.onkeydown = (e) => {
             switch (e.key) {
                 case 'ArrowUp':
@@ -92,81 +91,92 @@ class game {
         this.draw()
     }
     update() {
+        const prevX = this.snake[0].x
+        const prevY = this.snake[0].y
         let ate = false
-        let prev = { x: this.snake[0].x, y: this.snake[0].y }
-        //snake head move
         switch (this.dir) {
             case 'N':
-                this.snake[0].y--
+                this.snake.unshift({ x: prevX, y: prevY - 1, dir: 'N' })
                 break
             case 'E':
-                this.snake[0].x++
+                this.snake.unshift({ x: prevX + 1, y: prevY, dir: 'E' })
                 break
             case 'S':
-                this.snake[0].y++
+                this.snake.unshift({ x: prevX, y: prevY + 1, dir: 'S' })
                 break
             case 'W':
-                this.snake[0].x--
+                this.snake.unshift({ x: prevX - 1, y: prevY, dir: 'W' })
+        }
+        if (this.snake[0].x < 0 || this.snake[0].y < 0 || this.snake[0].x >= GBSIZE || this.snake[0].y >= GBSIZE) {
+            this.lose()
+            return
         }
         const entrytile = this.getEl(this.snake[0].x, this.snake[0].y)
-        //check if hit border
-        if (this.snake[0].x < 0 || this.snake[0].y < 0 || this.snake[0].x >= GBSIZE || this.snake[0].y >= GBSIZE)
-            this.lose()
-        else if (entrytile.children.length != 0) {
-            //check if ate food
+        if (entrytile.children.length != 0) {
             if (entrytile.children[0].classList.contains('food')) {
                 document.querySelector('.food').remove()
-                this.createFood()
                 ate = true
             }
-            //check if hit itself
-            else if (entrytile.children[0].classList.contains('snake'))
+            else if (entrytile.children[0].classList.contains('snake')) {
                 this.lose()
+                return
+            }
         }
-        //snake body move excluding head
-        for (let i = 1; i < this.snake.length; i++) {
-            let temp = { x: this.snake[i].x, y: this.snake[i].y }
-            this.snake[i] = { x: prev.x, y: prev.y }
-            prev = { x: temp.x, y: temp.y }
-        }
-        //make snake larger if ate
-        if (ate)
-            this.snake.push({ x: prev.x, y: prev.y })
+        if (!ate)
+            this.snake.pop()
     }
+
     draw() {
-        let els = document.querySelectorAll('.snake')
-        for (const e of els)
+        for (const e of document.querySelectorAll('.snake'))
             e.remove()
-        for (const [i, e] of this.snake.entries()) {
+        const lgt = this.snake.length
+        for (let i = 0; i < lgt; i++) {
             let el = document.createElement('div')
-            if (i == 0)
-                el.id = 'snakehead'
             el.classList.add('snake')
-            this.getEl(e.x, e.y).appendChild(el)
+            if (i !== 0)
+                el.classList.add(this.snake[i - 1].dir)
+            if (i === 0) {
+                el.classList.add(this.snake[i].dir)
+                el.classList.add('snakehead')
+            }
+            else if (i === lgt - 1) {
+                el.classList.add('snaketail')
+            }
+            else if (this.snake[i - 1].dir != this.snake[i].dir) {
+                const nxt = this.snake[i - 1].dir
+                const pre = this.snake[i].dir
+                if ((nxt == 'N' && pre == 'E')
+                    || (nxt == 'W' && pre == 'N')
+                    || (nxt == 'S' && pre == 'W')
+                    || (nxt == 'E' && pre == 'S'))
+                    el.classList.add('leftturn')
+                else
+                    el.classList.add('rightturn')
+            }
+            this.getEl(this.snake[i].x, this.snake[i].y).appendChild(el)
         }
-        //rotate head
-        switch (this.lastdir) {
-            case 'N':
-                document.getElementById('snakehead').style.transform = 'rotate(0deg)'
-                break
-            case 'E':
-                document.getElementById('snakehead').style.transform = 'rotate(90deg)'
-                break
-            case 'S':
-                document.getElementById('snakehead').style.transform = 'rotate(180deg)'
-                break
-            case 'W':
-                document.getElementById('snakehead').style.transform = 'rotate(270deg)'
-        }
-        //count
+        if (document.querySelectorAll('.food').length === 0)
+            this.createFood()
         document.getElementById('count').children[1].innerHTML = this.snake.length - 3
     }
+
+    lose() {
+        if (!GAMING)
+            return
+        GAMING = false
+        alert(`Game over!\nSnake length: ${this.snake.length - 1}`)
+        for (const e of document.getElementById('gameboard').children)
+            e.innerHTML = ''
+        new game()
+    }
+
     getEl(x, y) {
         let els = document.querySelectorAll(`.col${x}`)
         for (const e of els)
             if (e.classList.contains(`row${y}`))
                 return e
     }
+
     createFood() {
         const x = Math.floor(Math.random() * GBSIZE)
         const y = Math.floor(Math.random() * GBSIZE)
@@ -178,13 +188,6 @@ class game {
         }
         else
             this.createFood()
-    }
-    lose() {
-        GAMING = false
-        alert(`Game over!\nSnake length: ${this.snake.length}`)
-        for (const e of document.getElementById('gameboard').children)
-            e.innerHTML = ''
-        new game()
     }
 }
 
@@ -235,7 +238,6 @@ class settings {
         })
         window.addEventListener('keydown', (e) => {
             if (!this.active) return
-            console.log(e.key)
             if (e.key == 'Enter') {
                 this.handleConfirm()
             }

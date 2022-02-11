@@ -3,7 +3,7 @@
     --lighttile:rgb(0, 144, 84);
     --darktile:rgb(0, 104, 60);
     --gbborder: rgb(7, 82, 51);
-    --snake: rgb(19, 68, 204);
+    --snake: #3c97b8;
     --food: rgb(219, 9, 44);
     --confirm: rgb(15, 128, 80);
 }
@@ -98,16 +98,61 @@ html, body{
 }
 
 .snake{
-    width:100%;
-    height: 100%;
+    width:110%;
+    height: 110%;
     background:var(--snake);
 }
 
-#snakehead{
+.snakehead{
     background: none;
     background-image: url('gfx/snake.png');
     background-size: cover;
     z-index: 10;
+    width:101%;
+    height: 101%;
+}
+
+.snaketail{
+    background: none;
+    background-image: url('gfx/tail.png');
+    background-size: cover;
+    z-index: 10;
+    width:101%;
+    height: 101%;
+}
+
+.N{
+    transform: rotate(0deg);
+}
+
+.E{
+    transform: rotate(90deg);
+}
+
+.S{
+    transform: rotate(180deg);
+}
+
+.W{
+    transform: rotate(270deg);
+}
+
+.rightturn{
+    background: none;
+    background-image: url('gfx/rightturn.png');
+    background-size: cover;
+    z-index: 10;
+    width:101%;
+    height: 101%;
+}
+
+.leftturn{
+    background: none;
+    background-image: url('gfx/leftturn.png');
+    background-size: cover;
+    z-index: 10;
+    width:101%;
+    height: 101%;
 }
 
 .food{
