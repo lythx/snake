@@ -117,7 +117,7 @@ class game {
                 document.querySelector('.food').remove()
                 ate = true
             }
-            else if (entrytile.children[0].classList.contains('snake')) {
+            else if (entrytile.children[0].classList.contains('snake') && !entrytile.children[0].classList.contains('snaketail')) {
                 this.lose()
                 return
             }
